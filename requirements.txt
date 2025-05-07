@@ -1,0 +1,12 @@
+google-generativeai
+langchain
+jupyter
+dotenv
+langchain-google-genai
+pytubefix
+langchain_community
+scikit-learn
+docarray
+langchain_pinecone
+tiktoken
+git+https://github.com/openai/whisper.git
