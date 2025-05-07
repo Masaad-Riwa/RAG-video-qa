@@ -1,7 +1,3 @@
-conda install -c conda-forge ffmpeg
-
-
-
 ## Project: RAG Video QA
 
 ### 🔍 Overview
@@ -12,7 +8,7 @@ This project demonstrates how to build a Retrieval-Augmented Generation (RAG) sy
 - Embeds the chunks using Google Generative AI embeddings.
 - Stores embeddings in Pinecone, a vector database.
 - Uses similarity search to retrieve relevant chunks at query time.
-- Answers questions using Gemini 1.5 Pro via LangChain.
+- Answers questions using Gemini 1.5 Flash via LangChain.
 
 This approach is more efficient and scalable than providing the entire transcript to a model and enables querying very long videos.
 
@@ -22,109 +18,102 @@ This approach is more efficient and scalable than providing the entire transcrip
 
 1. **Install dependencies** (recommended in a virtual environment):
 
-```bash
-pip install -r requirements.txt
-```
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-Create a .env file in your project directory with the following content:
+    Create a .env file in your project directory with the following content:
 
-```ini
-PINECONE_API_KEY=your_pinecone_api_key
-GOOGLE_API_KEY=your_google_genai_api_key
-```
+    ```ini
+    PINECONE_API_KEY=your_pinecone_api_key
+    GOOGLE_API_KEY=your_google_genai_api_key
+    ```
 
-Replace your_pinecone_api_key and your_google_genai_api_key with actual keys (see next section for help on getting them).
+    Replace your_pinecone_api_key and your_google_genai_api_key with actual keys (see next section for help on getting them).
 
 2. **Install ffmpeg for Whisper**
-Whisper requires ffmpeg to be installed separately.
+    Whisper requires ffmpeg to be installed separately.
 
-If you're using Conda (recommended for Windows):
+    If you're using Conda (recommended for Windows):
 
-```bash
-conda install -c conda-forge ffmpeg
-```
+    ```bash
+    conda install -c conda-forge ffmpeg
+    ```
 
 3. **API Keys Setup**
-Google Generative AI (Gemini):
 
-Go to: https://aistudio.google.com/
+    Google Generative AI (Gemini):
 
-Generate an API key and paste it into the .env file.
+    * Go to: https://aistudio.google.com/
+    * Generate an API key and paste it into the .env file.
 
-Pinecone:
+    Pinecone:
+    * Create an account at https://www.pinecone.io/
+    * Get your API key from the Pinecone dashboard and paste it into .env.
 
-Create an account at https://www.pinecone.io/
-
-Get your API key from the Pinecone dashboard and paste it into .env.
 
 4. **Pinecone Index Setup**
-Go to the Pinecone dashboard.
 
-Create and index with custom configuration.
-
-Enter:
-
-Index name: youtube-rag-2 (or match what’s in your script).
-
-Metric: cosine
-
-Dimension: 3072 (matches embedding model output)
+    * Go to the Pinecone dashboard.
+    * Create and index with custom configuration.
+    * Enter:
+        * Index name: youtube-rag-2 (or match what’s in your script).
+        * Metric: cosine
+        * Dimension: 3072 (matches embedding model output)
 
 
-Wait for the index to be initialized before proceeding.
+    Wait for the index to be initialized before proceeding.
+
+---
 
 ### Workflow Summary
-Transcribe Video:
+1. Transcribe Video:
+* Downloads the audio stream from a YouTube video using pytubefix.
+* Uses whisper to generate a transcript.
+* Saves transcript to transcription.txt.
 
-Downloads the audio stream from a YouTube video using pytubefix.
+2. Split Transcript:
 
-Uses whisper to generate a transcript.
+* Uses RecursiveCharacterTextSplitter to split the text into smaller documents suitable for embedding.
 
-Saves transcript to transcription.txt.
+3. Embedding and Storage:
 
-Split Transcript:
+* Embeds each chunk using GoogleGenerativeAIEmbeddings.
+* Stores the embeddings in the Pinecone index.
 
-Uses RecursiveCharacterTextSplitter to split the text into smaller documents suitable for embedding.
+**Note:** We apply a 15-second delay between each request to respect Google GenAI's free tier rate limits.
 
-Embedding and Storage:
+3. RAG Pipeline (Querying):
 
-Embeds each chunk using GoogleGenerativeAIEmbeddings.
+* Uses similarity search to retrieve only relevant transcript chunks based on a user’s question.
+* Constructs a prompt using a template.
+* Feeds this context + question into Gemini to get a grounded, contextual answer.
 
-Stores the embeddings in your Pinecone index.
 
-Applies a 15-second delay between each request to respect Google GenAI's rate limits.
+**❓ Why Use RAG Instead of Feeding the Full Transcript?**
 
-RAG Pipeline (Querying):
-
-Uses similarity search to retrieve only relevant transcript chunks based on a user’s question.
-
-Constructs a prompt using a template.
-
-Feeds this context + question into Gemini Pro to get a grounded, contextual answer.
-
-❓ Why Use RAG Instead of Feeding the Full Transcript?
-Language models like Gemini Pro have a token limit. Long videos (like Lex Fridman's interviews) often exceed this limit, making it impractical to pass the full transcript as input.
+Language models like Gemini have a token limit. Long videos (like Lex Fridman's interviews) often exceed this limit, making it impractical to pass the full transcript as input.
 
 RAG solves this:
 
-It fetches only relevant parts of the transcript using semantic similarity search.
+It fetches only relevant parts of the transcript using semantic similarity search. This keeps prompts small, fast, and within token limits.
 
-This keeps prompts small, fast, and within token limits.
-
-It allows you to handle hours of content without compromising on response quality.
+---
 
 ### Sample Usage
-Once everything is set up, run the script and test with a question like:
+
+Once everything is set up, run the notebook and test with a question like:
 
 ```python
-chain.invoke("What accelerated the progress of the industry between 1996 and 2007?")
+chain.invoke("What does Yann LeCun say about Model-based reinforcement learning?")
 ```
 
 You’ll receive a contextual answer grounded in the video transcript.
 
 ### Notes
-Whisper is used in "base" mode, but you can upgrade to "medium" or "large" for better accuracy.
+
+Whisper is used in "base" mode, but it can be upgraded to "medium" or "large" for better accuracy.
 
 Ensure that the Pinecone index is correctly configured before embedding begins.
 
-If using large transcripts, consider batching document uploads or increasing delay based on your API limits.
+If using large transcripts, consider batching document uploads or increasing delay based on the API limits.
