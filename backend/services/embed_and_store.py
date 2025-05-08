@@ -10,8 +10,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configurable rate limits
-MAX_REQUESTS_PER_MINUTE = 5
-REQUEST_INTERVAL = 60  # seconds
+MAX_REQUESTS_PER_MINUTE = int(os.getenv("MAX_REQUESTS_PER_MINUTE"))
+REQUEST_INTERVAL = int(os.getenv("REQUEST_INTERVAL"))  # seconds
 DELAY_BETWEEN_DOCS = REQUEST_INTERVAL / MAX_REQUESTS_PER_MINUTE  # e.g., 12s
 
 
