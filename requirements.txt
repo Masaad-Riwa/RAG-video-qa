@@ -9,4 +9,8 @@ scikit-learn
 docarray
 langchain_pinecone
 tiktoken
+botbuilder-core
+aiohttp
+fastapi
+uvicorn
 git+https://github.com/openai/whisper.git
