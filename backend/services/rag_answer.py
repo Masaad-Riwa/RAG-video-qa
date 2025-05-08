@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def answer_question(question: str) -> str:
+def answer_question(question: str, session_id: str) -> str:
     google_api_key = os.getenv("GOOGLE_API_KEY")
     if not google_api_key:
         print("Google API Key not found. Please ensure it's set in your .env file.")
@@ -18,7 +18,8 @@ def answer_question(question: str) -> str:
 
     retriever = PineconeVectorStore.from_existing_index(
         index_name="youtube-rag",
-        embedding=GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-exp-03-07")
+        embedding=GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-exp-03-07"),
+        namespace=session_id
     ).as_retriever()
 
     prompt_template = ChatPromptTemplate.from_template("""

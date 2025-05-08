@@ -15,7 +15,7 @@ REQUEST_INTERVAL = 60  # seconds
 DELAY_BETWEEN_DOCS = REQUEST_INTERVAL / MAX_REQUESTS_PER_MINUTE  # e.g., 12s
 
 
-def embed_documents(text: str):
+def embed_documents(text: str, session_id: str):
     google_api_key = os.getenv("GOOGLE_API_KEY")
     if not google_api_key:
         print("Google API Key not found. Please ensure it's set in your .env file.")
@@ -29,7 +29,7 @@ def embed_documents(text: str):
     pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
     index = pc.Index("youtube-rag")
 
-    vectorstore = PineconeVectorStore.from_existing_index(index_name="youtube-rag", embedding=embeddings)
+    vectorstore = PineconeVectorStore.from_existing_index(index_name="youtube-rag", embedding=embeddings, namespace=session_id)
 
     for idx, doc in enumerate(docs):
         print(f"Embedding document {idx + 1} of {len(docs)}...")
