@@ -5,7 +5,7 @@ import os
 def transcribe_video(url: str) -> str:
     yt = YouTube(url)
     audio = yt.streams.filter(only_audio=True).first()
-    filename = "audio.mp4"
+    filename = "audio-file.mp4"
     audio.download(filename=filename)
 
     model = whisper.load_model("base")
