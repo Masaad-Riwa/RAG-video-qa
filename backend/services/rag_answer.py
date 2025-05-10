@@ -4,10 +4,10 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_pinecone import PineconeVectorStore
 import os
 from langchain_google_genai.embeddings import GoogleGenerativeAIEmbeddings
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
+from services import dev_settings
 
-
-load_dotenv()
+#load_dotenv()
 
 def answer_question(question: str, session_id: str) -> str:
     google_api_key = os.getenv("GOOGLE_API_KEY")

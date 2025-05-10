@@ -5,9 +5,12 @@ from langchain_pinecone import PineconeVectorStore
 from pinecone import Pinecone
 import os
 import time
-from dotenv import load_dotenv
+import sys
+from services import dev_settings
 
-load_dotenv()
+#from dotenv import load_dotenv
+
+#load_dotenv()
 
 # Configurable rate limits
 MAX_REQUESTS_PER_MINUTE = int(os.getenv("MAX_REQUESTS_PER_MINUTE"))
