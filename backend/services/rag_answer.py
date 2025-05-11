@@ -22,6 +22,12 @@ def answer_question(question: str, session_id: str) -> str:
         namespace=session_id
     ).as_retriever()
 
+    docs = retriever.get_relevant_documents(question)
+    if not docs:
+        print("No documents found for the session.")
+        return "You need to process a video first before asking questions."
+
+
     prompt_template = ChatPromptTemplate.from_template("""
     Answer the question based on the context below. Respond in a full sentence. If you can't answer, say "I don't know."
     
