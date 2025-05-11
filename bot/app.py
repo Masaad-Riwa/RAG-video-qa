@@ -4,6 +4,7 @@ from botbuilder.schema import Activity
 from bot.dialogs.main_dialog import MainDialog
 import os
 import asyncio
+import backend.services.dev_settings as dev_settings 
 
 
 APP_ID = os.getenv("MICROSOFT_APP_ID", "")
